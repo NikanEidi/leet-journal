@@ -1,11 +1,6 @@
-# Python Fundamentals — Hash Map Pattern (Contains Duplicate, COLD — no steps given)
-# Session: DSA problem-solving practice, 2026-10-16
-# Write your own code below. Run with: python3 05_contains_duplicate.py
-
-# Problem: given an array of numbers, return True if any value appears at
-# least twice, otherwise return False.
-# Example: [1, 2, 3, 1] -> True
-# Example: [1, 2, 3, 4] -> False
+# Contains Duplicate — does any number repeat in the list? (solved cold,
+# no hints). Two versions: counting first, then a faster early-exit one.
+# 2026-10-16.
 
 nums = [1, 2, 3, 1]
 m_counter = {}

@@ -1,6 +1,6 @@
 # leet-journal
 
-Real DSA/LeetCode practice — not just clean final solutions, but the actual journey: what I tried, what broke, why, and the fix. Started 2026-10-16.
+Real DSA/LeetCode practice in Python — not just clean final solutions, but the actual journey: what I tried, what broke, why, and the fix. Problem-solving started 2026-10-10; this repo was set up 2026-10-16 to hold it properly.
 
 ## Structure
 
@@ -11,7 +11,7 @@ Real DSA/LeetCode practice — not just clean final solutions, but the actual jo
 
 1. A problem is explained in plain English, sometimes with hints, sometimes cold (no hints at all).
 2. I write the solution myself in `code/`, run it, and share the real output — including every failed attempt.
-3. Each real bug (syntax errors, logic errors, edge cases missed) gets written into the matching pattern note in `notes/` — the goal is a record I can actually talk through in an interview, not a highlight reel.
+3. Each real bug (syntax errors, logic errors, edge cases missed) gets written into the matching pattern note in `notes/`.
 
 ## Patterns covered so far
 

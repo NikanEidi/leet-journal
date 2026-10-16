@@ -1,184 +1,171 @@
-# 🗂️ Pattern 01 — Hashmap (Dictionary)
+# Pattern: Hashmap (dictionary)
 
-**When to use:**
-- Counting things
-- Fast lookup ("have I seen this before?")
-- Grouping (anagrams, categories)
-- Two-sum style (complement lookup)
+I use this whenever I need to count something, look something up fast, or group things together. The mental model I keep in my head: if I catch myself writing a nested loop just to check "have I seen this before," that's the signal a hashmap would do it in one pass instead. Average O(1) insert, lookup, and delete.
 
-**Big O:** average O(1) insert, lookup, delete. Space O(n).
+## Second Largest Number — 2026-10-10
 
-**The mental model:** whenever you catch yourself doing nested loops to check something, ask: *"can I trade space for time with a hashmap?"* — usually yes.
+Find the second-largest number in a list without using `sort()` or `max()`. I tracked two running values as I went — the current max and the current second-max — updating both in a single pass depending on where the new number landed compared to each. No hashmap here, just the warmup that got me thinking in terms of "keep running state instead of rescanning."
 
----
+```python
+m_list = [10, 3, 9]
+if m_list[0] > m_list[1]:
+    p_current_max = m_list[0]
+    s_current_max = m_list[1]
+else:
+    p_current_max = m_list[1]
+    s_current_max = m_list[0]
 
-## 🎯 The 5 core problems (solve in this order)
-
-### 1. Word Frequency (warmup)
-
-**Problem:** given an array of words, return a dictionary of word → count.
-
-```javascript
-function wordFrequency(words) {
-  const counts = {};
-  for (const word of words) {
-    counts[word] = (counts[word] || 0) + 1;
-  }
-  return counts;
-}
+for item in m_list:
+    if item > p_current_max:
+        s_current_max = p_current_max
+        p_current_max = item
+    elif item > s_current_max and item < p_current_max:
+        s_current_max = item
+print(s_current_max)
 ```
 
-**Key trick:** `counts[word] || 0` handles the missing key case.
+## Two Sum — 2026-10-12
 
-**Test:**
-```javascript
-wordFrequency(['apple', 'banana', 'apple']);
-// { apple: 2, banana: 1 }
+Given a list of numbers and a target, find the two numbers that add up to it. I built a dict as I went: for each number, I check whether its complement (target minus the number) is already in the dict. If it is, I've found my pair. If not, I add the current number to the dict and keep going. One pass, O(n), instead of checking every pair with a nested loop.
+
+```python
+nums = [2, 4, 6, 8, 10, 12, 14]
+target = 8
+seen = {}
+
+for i, v in enumerate(nums):
+    complement = target - v
+    if complement not in seen:
+        seen[v] = i
+    else:
+        print([seen[complement], i])
 ```
 
-**Narration to say out loud:**
-> "I'll use a dictionary to count. For each word, if it's already there I add one. Otherwise I start at zero plus one, which is one. Return the dict."
+## Anagram Check — 2026-10-12
 
----
+Given two strings, check if they're anagrams of each other. I counted every letter of the first string into a dict, then walked the second string subtracting from those same counts. If a letter from the second string isn't in the dict at all, they can't be anagrams. I also check the lengths up front, since two strings of different lengths can never be anagrams no matter what the letters are.
 
-### 2. Two Sum
+```python
+p_str = "Nikan"
+s_str = "Hello"
+counts = {}
+is_anagram = True
 
-**Problem:** given an array `nums` and a target, return indices of two numbers that add to target.
+if len(p_str) != len(s_str):
+    is_anagram = False
 
-**Brute force (O(n²) — DON'T ship this in an interview, but MENTION it first):**
-```javascript
-function twoSumBrute(nums, target) {
-  for (let i = 0; i < nums.length; i++) {
-    for (let j = i + 1; j < nums.length; j++) {
-      if (nums[i] + nums[j] === target) return [i, j];
-    }
-  }
-  return null;
-}
+for letter in p_str:
+    if letter in counts:
+        counts[letter] += 1
+    else:
+        counts[letter] = 1
+
+for letter in s_str:
+    if letter in counts:
+        counts[letter] -= 1
+    else:
+        is_anagram = False
+
+print("Anagram" if is_anagram else "Not Anagram")
 ```
 
-**Hashmap solution (O(n)):**
-```javascript
-function twoSum(nums, target) {
-  const seen = {};
-  for (let i = 0; i < nums.length; i++) {
-    const complement = target - nums[i];
-    if (complement in seen) {
-      return [seen[complement], i];
-    }
-    seen[nums[i]] = i;
-  }
-  return null;
-}
+## First Unique Character — 2026-10-12
+
+Solved cold, no hints given beforehand. Given a string, return the first character that appears exactly once. I counted every character first, then walked the string a second time looking for the first one whose count is exactly 1. Two passes, but both are O(n), so it stays linear overall.
+
+```python
+p_string = "swiss"
+count = {}
+
+for word in p_string:
+    if word in count:
+        count[word] += 1
+    else:
+        count[word] = 1
+
+p_unique = None
+for u_word in p_string:
+    if count[u_word] == 1:
+        p_unique = u_word
+        break
+
+print(p_unique)
 ```
 
-**Narration:**
-> "For each number, I check if its complement is in the seen dict. If yes, return the two indices. Otherwise add current to the dict. This trades space for time — O(n) instead of O(n²)."
+## Group Anagrams — 2026-10-16
 
-**Trap:** add to dict AFTER checking, not before. Otherwise duplicate values fail.
+Solved cold. Given a list of words, group every set of anagrams together. The insight I needed: if I sort the letters of a word, every anagram of that word sorts to the exact same string — so the sorted letters become a shared key. I loop through the words, build that key for each one, and either append to an existing group in my dict or start a new one.
 
----
+I got stuck for a second right at the start — I wrote `if words[]`, trying to check against the original list instead of a separate dict I hadn't built yet. Once I separated the two pieces in my head — building the key with `sorted()` + `"".join()`, then checking that key against my own dict, not the input list — the rest came together on the first try and matched the expected output exactly.
 
-### 3. Contains Duplicate
+```python
+words = ["eat", "tea", "tan", "ate", "nat", "bat"]
+counts = {}
 
-**Problem:** return true if any value appears twice.
+for word in words:
+    key = "".join(sorted(word))
+    if key in counts:
+        counts[key].append(word)
+    else:
+        counts[key] = [word]
 
-**Simple:**
-```javascript
-function hasDup(arr) {
-  return new Set(arr).size !== arr.length;
-}
+print(counts)
+# {'aet': ['eat', 'tea', 'ate'], 'ant': ['tan', 'nat'], 'abt': ['bat']}
 ```
 
-**Early-exit (better for huge inputs):**
-```javascript
-function hasDup(arr) {
-  const seen = new Set();
-  for (const x of arr) {
-    if (seen.has(x)) return true;
-    seen.add(x);
-  }
-  return false;
-}
+## Contains Duplicate — 2026-10-16
+
+Solved cold. Given a list of numbers, return whether any value repeats. I wrote two versions.
+
+The first one counts every number into a dict, then does a second pass checking whether any count is 2 or more. It works, but it always does two full passes even if a duplicate shows up in the first two elements.
+
+```python
+nums = [1, 2, 3, 1]
+m_counter = {}
+found_duplicate = False
+
+for i in nums:
+    if i in m_counter:
+        m_counter[i] += 1
+    else:
+        m_counter[i] = 1
+
+for i in m_counter:
+    if m_counter[i] >= 2:
+        found_duplicate = True
+        break
+
+print(found_duplicate)
 ```
 
-**My actual session (2026-10-16, Python, `05_contains_duplicate.py`) — real bugs hit, not the clean version above:**
-1. Solved it the "counting" way first (dict of value → count, then a second loop checking for any count ≥ 2) — works, but two passes and a full dict even if the first two elements are already a duplicate.
-2. First real bug: wrote `return True` / `return False` at the top level of the file, outside any function → `SyntaxError: 'return' outside function`. `return` only means something inside a `def`.
-3. Fixed it to `print(...)`, but then wrote `print(False)` **unconditionally**, outside the `if` — so it printed both `True` (from inside the loop, when found) and `False` (always, right after) on every run. Looked like a logic bug but was really an indentation/placement bug: the unconditional line needs to be the *only* line that decides the final answer, not a leftover default sitting next to the real one.
-4. Next attempt put the print inside `if`/`else` of the counting loop — ran, but printed once *per key* in the dict (`True`, `False`, `False` for 3 keys) instead of one final answer for the whole array. The fix (flag + `break`) is the actual bridge from "checking every element independently" to "stopping as soon as the array-level question is answered."
-5. Wrote the flag version (`found_duplicate = True; break`) but forgot to initialize `found_duplicate = False` before the loop — worked fine on `[1,2,3,1]` (duplicate exists, gets set), but on a no-duplicate input like `[1,2,3,4]` it crashed with `NameError: name 'found_duplicate' is not defined`, because the variable is only ever created inside the `if` branch that never ran. Lesson: a flag that might never get set inside a loop has to be initialized *before* the loop, every time — this is the single most common hashmap/loop bug in this whole session.
-6. Then wrote the real early-exit version (single loop, `set`-style dict, `break` on first repeat) — correct in one try once the counting version's bugs were already worked out.
+The second one checks and inserts in the same single pass — the moment I see a number that's already in my dict, I know the answer and can stop right there without reading the rest of the list.
 
----
+```python
+m_seen = {}
+found_duplicate = False
 
-### 4. Group Anagrams
+for number in nums:
+    if number in m_seen:
+        found_duplicate = True
+        break
+    else:
+        m_seen[number] = True
 
-**Problem:** group words that are anagrams of each other.
-
-```javascript
-function groupAnagrams(words) {
-  const groups = {};
-  for (const word of words) {
-    const key = word.split('').sort().join('');
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(word);
-  }
-  return Object.values(groups);
-}
+print(found_duplicate)
 ```
 
-**Key insight:** sorted letters = canonical key. Anagrams share the key.
+## Still ahead for this pattern
 
-**Narration:**
-> "For each word, sort its letters to make a key. All anagrams share that key. Group them in a dict, return the values."
+Longest Substring Without Repeating Characters — a hashmap combined with a sliding window. This is the bridge into the two-pointer pattern.
 
-**My actual session (2026-10-16, Python, `04_group_anagrams.py`) — solved COLD, no steps given:**
-Got stuck for a moment at the very start (`for word in words: if words[]`) — reached for indexing into the original array before realizing the thing that needs checking is a *separate* dict being built up, not `words` itself. Once talked through two pieces separately — (1) `sorted(word)` returns a list of characters, (2) `"".join(...)` turns that list back into a string key — assembled the full three-line loop body correctly on the first try: build key, `if key in counts: append`, `else: start a new list`. Ran clean, matched the expected grouping exactly on the first run.
+## Common mistakes I actually hit
 
-### 5. Longest Substring Without Repeating Characters (harder)
+- Checking a list of keys I built instead of the dict I'm supposed to be checking.
+- Printing or returning something unconditionally, so it fires even when it shouldn't.
+- Printing inside a loop when I actually want one final answer for the whole input, not one per item.
+- Using a flag variable inside a loop without initializing it before the loop, in case the loop never sets it.
 
-**Problem:** given a string, return length of the longest substring without repeating chars.
+## When I would NOT reach for a hashmap
 
-```javascript
-function longestUnique(s) {
-  const lastSeen = {};
-  let start = 0;
-  let best = 0;
-  for (let i = 0; i < s.length; i++) {
-    if (s[i] in lastSeen && lastSeen[s[i]] >= start) {
-      start = lastSeen[s[i]] + 1;
-    }
-    lastSeen[s[i]] = i;
-    best = Math.max(best, i - start + 1);
-  }
-  return best;
-}
-```
-
-**Combined pattern:** sliding window + hashmap. This bridges into the two-pointer pattern.
-
----
-
-## 🚨 Common Mistakes
-
-- `counts[word] += 1` without initializing → NaN + 1 → NaN. Use `(counts[word] || 0) + 1`.
-- Using `hasOwnProperty` when a simple `in` check works
-- Forgetting that JS object keys are strings — numbers get coerced. If you need real numeric keys, use `Map`.
-- Nested loops when a hashmap would work — the sign you're missing this pattern
-
----
-
-## 💡 When NOT to use hashmap
-
-- When order matters strictly (use array)
-- When memory is really tight (hashmaps are big)
-- When you only have 2 elements to compare (overkill)
-
----
-
-## 🎤 Interview soundbites
-
-- *"I'll trade space for time with a hashmap — O(n) instead of O(n²)."*
-- *"For lookup problems, hashmap is usually my first tool."*
-- *"I'll check if we've seen it before, and if not, add it to the dict."*
+- When the order of things actually matters and I need that order preserved as-is — a dict in Python 3.7+ keeps insertion order, but if I'm doing index math, a plain list is still the right tool.
+- When I'm only ever comparing two or three fixed elements — a hashmap is overkill for that.

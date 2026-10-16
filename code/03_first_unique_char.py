@@ -1,10 +1,5 @@
-# Python Fundamentals — First Non-Repeating Character (COLD, no steps given)
-# Session: learn-from-zero, 2026-10-12
-# Write your own code below. Run with: python3 03_first_unique_char.py
-
-# Problem: given a string, return the first character that appears exactly
-# once in the whole string. Return None if there isn't one.
-# Example: "swiss" -> "w"
+# First character that appears exactly once in a string (solved cold,
+# no hints). "swiss" -> "w". 2026-10-12.
 
 p_string = "swiss"
 count = {}

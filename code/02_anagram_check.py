@@ -1,8 +1,4 @@
-# Python Fundamentals — Hash Map Pattern (Anagram Check)
-# Session: learn-from-zero, 2026-10-12
-# Write your own code below each prompt. Run with: python3 02_anagram_check.py
-
-# Problem: Given two strings, check if one is an anagram of the other
+# Anagram check — are two strings made of the exact same letters? 2026-10-12.
 
 p_str = "Nikan"
 s_str = "Hello"
