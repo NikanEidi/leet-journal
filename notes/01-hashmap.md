@@ -154,9 +154,30 @@ for number in nums:
 print(found_duplicate)
 ```
 
-## Still ahead for this pattern
+## Longest Substring Without Repeating Characters — 2026-10-17
 
-Longest Substring Without Repeating Characters — a hashmap combined with a sliding window. This is the bridge into the two-pointer pattern.
+This one bridges into the sliding window pattern — a hashmap combined with two pointers marking the edges of a window. Given a string, I need the length of the longest stretch with no repeated character inside it.
+
+I keep a dict of the last index where each character was seen, a `p_start` marking the left edge of my current window, and `longest_path` for the best length found so far. For every character, if I've seen it before *and* that previous sighting is still inside my current window (`>= p_start`), I move `p_start` to right after where it was last seen. Either way, I record the current character's index, then check whether the window right now (`p_end - p_start + 1`) beats my best.
+
+Solved clean on the first try, no bugs:
+
+```python
+s = "abcabcbb"
+m_last_seen = {}
+p_start = 0
+longest_path = 0
+
+for p_end, value in enumerate(s):
+    if value in m_last_seen and m_last_seen[value] >= p_start:
+        p_start = m_last_seen[value] + 1
+    m_last_seen[value] = p_end
+    longest_path = max(longest_path, p_end - p_start + 1)
+
+print(longest_path)
+```
+
+The detail that mattered most: checking `m_last_seen[value] >= p_start`, not just `value in m_last_seen`. A character seen long ago, before the window's current left edge, isn't actually a repeat *inside* the window — it's already fallen out of range, so it shouldn't push `p_start` backward.
 
 ## Common mistakes I actually hit
 
